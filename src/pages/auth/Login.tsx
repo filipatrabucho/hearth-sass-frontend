@@ -1,6 +1,8 @@
-import { Flame, ShieldCheck, Users2, Ticket } from 'lucide-react'
+import { Link } from 'react-router-dom'
+import { ShieldCheck, Users2, Ticket } from 'lucide-react'
 
 import { useAuth } from '@/context/AuthContext'
+import { Logo } from '@/components/Logo'
 
 const DiscordMark = () => (
   <svg viewBox="0 0 127.14 96.36" className="h-5 w-5" fill="currentColor" aria-hidden>
@@ -18,9 +20,9 @@ export default function Login() {
 
       <div className="relative z-10 w-full max-w-sm">
         <div className="mb-8 flex flex-col items-center text-center">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-brand-gradient shadow-glow">
-            <Flame size={24} className="text-white" />
-          </div>
+          <Link to="/">
+            <Logo size={48} className="shadow-glow" />
+          </Link>
           <h1 className="mt-4 text-2xl font-bold tracking-tight text-ink">HearthGG</h1>
           <p className="mt-1.5 text-sm text-ink-muted">Manage your Discord communities in one place.</p>
         </div>

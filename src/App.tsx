@@ -1,5 +1,5 @@
 import { lazy, Suspense } from 'react'
-import { Navigate, Route, Routes } from 'react-router-dom'
+import { Route, Routes } from 'react-router-dom'
 
 import { ProtectedRoute, GuestRoute } from '@/components/layout/ProtectedRoute'
 import { AppLayout } from '@/components/layout/AppLayout'
@@ -9,6 +9,7 @@ import { PageSpinner } from '@/components/ui/Spinner'
 import Login from '@/pages/auth/Login'
 import NotFound from '@/pages/NotFound'
 import Dashboard from '@/pages/Dashboard'
+import Home from '@/pages/marketing/Home'
 
 const MembersPage = lazy(() => import('@/pages/members/MembersPage'))
 const BansPage = lazy(() => import('@/pages/bans/BansPage'))
@@ -23,18 +24,20 @@ const AnalyticsPage = lazy(() => import('@/pages/analytics/AnalyticsPage'))
 const SettingsPage = lazy(() => import('@/pages/settings/SettingsPage'))
 const BotCallbackPage = lazy(() => import('@/pages/settings/BotCallbackPage'))
 const ClientsPage = lazy(() => import('@/pages/clients/ClientsPage'))
+const LeadsPage = lazy(() => import('@/pages/leads/LeadsPage'))
 
 export default function App() {
   return (
     <Suspense fallback={<PageSpinner />}>
       <Routes>
+        <Route path="/" element={<Home />} />
+
         <Route element={<GuestRoute />}>
           <Route path="/login" element={<Login />} />
         </Route>
 
         <Route element={<ProtectedRoute />}>
           <Route element={<AppLayout />}>
-            <Route index element={<Navigate to="/dashboard" replace />} />
             <Route path="/dashboard" element={<Dashboard />} />
 
             <Route
@@ -132,6 +135,14 @@ export default function App() {
               element={
                 <RequireSuperAdmin>
                   <ClientsPage />
+                </RequireSuperAdmin>
+              }
+            />
+            <Route
+              path="/leads"
+              element={
+                <RequireSuperAdmin>
+                  <LeadsPage />
                 </RequireSuperAdmin>
               }
             />

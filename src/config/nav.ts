@@ -11,6 +11,7 @@ import {
   BarChart3,
   Settings,
   Building2,
+  Inbox,
   type LucideIcon,
 } from 'lucide-react'
 import type { ClientRole, ModuleKey } from '@/types'
@@ -40,6 +41,7 @@ export const primaryNav: NavItem[] = [
 export const secondaryNav: NavItem[] = [
   { to: '/settings', label: 'Settings', icon: Settings, minRole: 'admin' },
   { to: '/clients', label: 'All clients', icon: Building2, superAdminOnly: true },
+  { to: '/leads', label: 'Leads', icon: Inbox, superAdminOnly: true },
 ]
 
 const roleWeight: Record<ClientRole, number> = { staff: 0, admin: 1, owner: 2 }

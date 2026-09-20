@@ -1,11 +1,15 @@
 import { NavLink } from 'react-router-dom'
 import { clsx } from 'clsx'
-import { Flame, ExternalLink, Sparkles } from 'lucide-react'
+import { ExternalLink, Sparkles, Crown } from 'lucide-react'
 
 import { useAuth } from '@/context/AuthContext'
 import { useClient } from '@/context/ClientContext'
 import { primaryNav, secondaryNav, meetsRole } from '@/config/nav'
 import { Avatar, discordAvatarUrl } from '@/components/ui/Avatar'
+import { Logo } from '@/components/Logo'
+
+const planLabel: Record<string, string> = { free: 'Free', pro: 'Pro', enterprise: 'Enterprise' }
+const nextPlan: Record<string, string> = { free: 'Pro', pro: 'Enterprise', enterprise: 'Enterprise' }
 
 function NavRow({ item, onNavigate }: { item: (typeof primaryNav)[number]; onNavigate?: () => void }) {
   const Icon = item.icon
@@ -48,9 +52,7 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
   return (
     <div className="flex h-full flex-col bg-base-surface">
       <div className="flex items-center gap-2.5 px-5 pb-5 pt-6">
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-gradient shadow-glow">
-          <Flame size={17} className="text-white" />
-        </div>
+        <Logo size={30} className="shadow-glow" />
         <span className="text-[15px] font-bold tracking-tight text-ink">HearthGG</span>
       </div>
 
@@ -84,19 +86,36 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
               Set up now <ExternalLink size={12} />
             </span>
           </NavLink>
+        ) : activeClient && activeClient.plan !== 'enterprise' && meetsRole(role, 'admin') ? (
+          <NavLink
+            to="/settings"
+            onClick={onNavigate}
+            className="block overflow-hidden rounded-xl2 bg-upgrade-gradient p-4 shadow-glow transition-transform hover:scale-[1.01]"
+          >
+            <Crown size={18} className="text-white/90" />
+            <p className="mt-2 text-sm font-semibold text-white">Upgrade to {nextPlan[activeClient.plan]}</p>
+            <p className="mt-1 text-xs leading-relaxed text-white/75">
+              Unlock more modules and priority support for {activeClient.name}.
+            </p>
+            <span className="mt-3 inline-flex items-center justify-center rounded-lg bg-white/15 px-3 py-1.5 text-xs font-semibold text-white hover:bg-white/25">
+              Upgrade plan
+            </span>
+          </NavLink>
         ) : (
-          <div className="rounded-xl2 border border-base-border bg-base-surface-2 p-4">
-            <p className="text-xs text-ink-muted">Need a hand?</p>
-            <p className="mt-1 text-sm font-medium text-ink">Support guide</p>
-            <a
-              href="https://github.com/filipatrabucho/hearth-sass"
-              target="_blank"
-              rel="noreferrer"
-              className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-brand-300 hover:text-brand-200"
-            >
-              Read the docs <ExternalLink size={12} />
-            </a>
-          </div>
+          activeClient && (
+            <div className="rounded-xl2 border border-base-border bg-base-surface-2 p-4">
+              <p className="text-xs text-ink-muted">Current plan</p>
+              <p className="mt-1 text-sm font-medium text-ink">{planLabel[activeClient.plan] ?? activeClient.plan}</p>
+              <a
+                href="https://github.com/filipatrabucho/hearth-sass"
+                target="_blank"
+                rel="noreferrer"
+                className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-brand-300 hover:text-brand-200"
+              >
+                Read the docs <ExternalLink size={12} />
+              </a>
+            </div>
+          )
         )}
       </div>
 

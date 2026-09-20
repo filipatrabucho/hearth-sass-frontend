@@ -2,7 +2,7 @@ import { forwardRef, type ButtonHTMLAttributes } from 'react'
 import { clsx } from 'clsx'
 import { Loader2 } from 'lucide-react'
 
-type Variant = 'primary' | 'secondary' | 'ghost' | 'danger' | 'subtle'
+type Variant = 'primary' | 'secondary' | 'ghost' | 'danger' | 'subtle' | 'upgrade' | 'outline-brand' | 'outline-info'
 type Size = 'sm' | 'md' | 'lg' | 'icon'
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -14,11 +14,17 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 const variantClasses: Record<Variant, string> = {
   primary:
     'bg-brand-gradient text-white shadow-glow hover:brightness-110 active:brightness-95 disabled:opacity-50',
+  upgrade:
+    'bg-upgrade-gradient text-white shadow-glow hover:brightness-110 active:brightness-95 disabled:opacity-50',
   secondary:
     'bg-base-surface-3 text-ink border border-base-border hover:bg-[#272242] disabled:opacity-50',
   ghost: 'text-ink-muted hover:text-ink hover:bg-base-surface-2 disabled:opacity-40',
   subtle: 'bg-base-surface-2 text-ink-muted hover:text-ink hover:bg-base-surface-3 border border-transparent',
   danger: 'bg-accent-red/15 text-red-300 border border-accent-red/30 hover:bg-accent-red/25 disabled:opacity-50',
+  'outline-brand':
+    'bg-transparent text-brand-200 border border-brand-500/40 hover:bg-brand-500/10 disabled:opacity-50',
+  'outline-info':
+    'bg-transparent text-sky-300 border border-accent-blue/40 hover:bg-accent-blue/10 disabled:opacity-50',
 }
 
 const sizeClasses: Record<Size, string> = {

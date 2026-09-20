@@ -198,6 +198,22 @@ export interface AnalyticsSummary {
   upcoming_events: number
 }
 
+export type LeadStatus = 'new' | 'contacted' | 'converted' | 'archived'
+
+export interface Lead {
+  id: number
+  name: string
+  email: string
+  discord_username: string | null
+  server_name: string | null
+  plan_interest: ClientPlan
+  message: string | null
+  status: LeadStatus
+  source: string | null
+  created_at: string
+  updated_at: string
+}
+
 /** Raw Discord scheduled-event object. */
 export interface DiscordScheduledEvent {
   id: string

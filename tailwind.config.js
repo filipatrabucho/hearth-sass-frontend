@@ -59,6 +59,7 @@ export default {
       backgroundImage: {
         'brand-gradient': 'linear-gradient(135deg, #8f78f8 0%, #6a42ef 55%, #5b32d6 100%)',
         'promo-gradient': 'linear-gradient(160deg, #a78bff 0%, #6a42ef 60%, #3f2a9c 100%)',
+        'upgrade-gradient': 'linear-gradient(135deg, #f45fb0 0%, #b463e0 50%, #6a42ef 100%)',
       },
     },
   },

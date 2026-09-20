@@ -18,9 +18,12 @@ function isModuleActive(client: Client | undefined, key: ModuleKey | string): bo
 interface ClientContextValue {
   clients: Client[]
   clientsLoading: boolean
+  clientsError: boolean
+  refetchClients: () => void
   activeClient: Client | undefined
   activeClientId: number | null
   activeClientLoading: boolean
+  activeClientError: boolean
   setActiveClientId: (id: number) => void
   role: ClientRole
   hasModule: (key: ModuleKey | string) => boolean
@@ -37,7 +40,12 @@ export function ClientProvider({ children }: { children: ReactNode }) {
     return raw ? Number(raw) : null
   })
 
-  const { data: clients = [], isLoading: clientsLoading } = useQuery({
+  const {
+    data: clients = [],
+    isLoading: clientsLoading,
+    isError: clientsError,
+    refetch: refetchClients,
+  } = useQuery({
     queryKey: ['clients'],
     queryFn: async () => (await api.get<Client[]>('/clients')).data,
     enabled: !!user,
@@ -60,6 +68,7 @@ export function ClientProvider({ children }: { children: ReactNode }) {
   const {
     data: activeClient,
     isLoading: activeClientLoading,
+    isError: activeClientError,
     refetch: refetchActiveClient,
   } = useQuery({
     queryKey: ['client', activeClientId],
@@ -84,15 +93,29 @@ export function ClientProvider({ children }: { children: ReactNode }) {
     () => ({
       clients,
       clientsLoading,
+      clientsError,
+      refetchClients: () => refetchClients(),
       activeClient,
       activeClientId,
       activeClientLoading,
+      activeClientError,
       setActiveClientId,
       role,
       hasModule: (key) => isModuleActive(activeClient, key),
       refetchActiveClient: () => refetchActiveClient(),
     }),
-    [clients, clientsLoading, activeClient, activeClientId, activeClientLoading, role, refetchActiveClient],
+    [
+      clients,
+      clientsLoading,
+      clientsError,
+      refetchClients,
+      activeClient,
+      activeClientId,
+      activeClientLoading,
+      activeClientError,
+      role,
+      refetchActiveClient,
+    ],
   )
 
   return <ClientContext.Provider value={value}>{children}</ClientContext.Provider>

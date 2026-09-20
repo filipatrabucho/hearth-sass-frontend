@@ -1,9 +1,33 @@
 import { useState } from 'react'
-import { Outlet } from 'react-router-dom'
+import { Outlet, useLocation } from 'react-router-dom'
 
 import { Sidebar } from '@/components/layout/Sidebar'
 import { Topbar } from '@/components/layout/Topbar'
 import { ClientSwitcher } from '@/components/layout/ClientSwitcher'
+import { NoClientsOrErrorState } from '@/components/layout/NoClientsState'
+import { useClient } from '@/context/ClientContext'
+import { PageSpinner } from '@/components/ui/Spinner'
+
+function AppContent() {
+  const location = useLocation()
+  const { clients, clientsLoading, clientsError, activeClientId, activeClientLoading, activeClientError } =
+    useClient()
+
+  // /clients is how a super admin gets out of the zero-clients state, and
+  // neither it nor /leads depends on an active client, so both always
+  // render regardless of whether one exists yet.
+  if (location.pathname.startsWith('/clients') || location.pathname.startsWith('/leads')) {
+    return <Outlet />
+  }
+
+  if (clientsLoading) return <PageSpinner />
+  if (clientsError) return <NoClientsOrErrorState />
+  if (!clients.length) return <NoClientsOrErrorState />
+  if (activeClientId && activeClientLoading) return <PageSpinner />
+  if (activeClientError) return <NoClientsOrErrorState />
+
+  return <Outlet />
+}
 
 export function AppLayout() {
   const [mobileOpen, setMobileOpen] = useState(false)
@@ -29,7 +53,7 @@ export function AppLayout() {
           <ClientSwitcher />
         </div>
         <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
-          <Outlet />
+          <AppContent />
         </main>
       </div>
     </div>

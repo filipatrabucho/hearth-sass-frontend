@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
   Users,
@@ -12,6 +13,7 @@ import {
   BadgeCheck,
   ShieldAlert,
   Bot,
+  Inbox,
 } from 'lucide-react'
 
 import { useAuth } from '@/context/AuthContext'
@@ -19,6 +21,7 @@ import { useClient } from '@/context/ClientContext'
 import { useAnalyticsSummary } from '@/hooks/queries/useAnalytics'
 import { useTickets } from '@/hooks/queries/useTickets'
 import { usePosts } from '@/hooks/queries/usePosts'
+import { useLeads } from '@/hooks/queries/useLeads'
 import { Card, CardBody, CardHeader } from '@/components/ui/Card'
 import { Badge, StatusDot } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
@@ -27,6 +30,15 @@ import { PageSpinner } from '@/components/ui/Spinner'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { formatDate, formatNumber, formatRelativeTime } from '@/lib/format'
 import { meetsRole } from '@/config/nav'
+import { LeadDetailModal } from '@/pages/leads/LeadDetailModal'
+import type { Lead, LeadStatus } from '@/types'
+
+const leadStatusTone: Record<LeadStatus, 'info' | 'success' | 'brand' | 'neutral'> = {
+  new: 'info',
+  contacted: 'brand',
+  converted: 'success',
+  archived: 'neutral',
+}
 
 const planLabel: Record<string, string> = { free: 'Free', pro: 'Pro', enterprise: 'Enterprise' }
 
@@ -38,6 +50,8 @@ export default function Dashboard() {
   const { data: summary, isLoading: summaryLoading } = useAnalyticsSummary(analyticsEnabled ? activeClientId : null)
   const { data: tickets } = useTickets(hasModule('tickets') ? activeClientId : null)
   const { data: posts } = usePosts(hasModule('posts') ? activeClientId : null)
+  const { data: leads } = useLeads({}, !!user?.is_super_admin)
+  const [selectedLead, setSelectedLead] = useState<Lead | null>(null)
 
   if (activeClientLoading || !activeClient) return <PageSpinner />
 
@@ -179,6 +193,46 @@ export default function Dashboard() {
               )}
             </CardBody>
           </Card>
+
+          {user?.is_super_admin && (
+            <Card>
+              <CardHeader
+                title="Recent sign-ups"
+                description="New leads from the marketing site's “get started” form"
+                icon={<Inbox size={16} />}
+                action={
+                  <Link to="/leads" className="text-xs font-semibold text-brand-300 hover:text-brand-200">
+                    View all
+                  </Link>
+                }
+              />
+              <CardBody className="pt-3">
+                {!leads?.length ? (
+                  <p className="text-sm text-ink-muted">No sign-ups yet.</p>
+                ) : (
+                  <div className="divide-y divide-base-border-soft">
+                    {leads.slice(0, 5).map((lead) => (
+                      <button
+                        key={lead.id}
+                        onClick={() => setSelectedLead(lead)}
+                        className="-mx-2 flex w-full items-center justify-between gap-3 rounded-lg px-2 py-2.5 text-left hover:bg-base-surface-2"
+                      >
+                        <div className="min-w-0">
+                          <p className="truncate text-sm font-medium text-ink">{lead.name}</p>
+                          <p className="truncate text-xs text-ink-muted">
+                            {lead.server_name ?? lead.email} · {formatRelativeTime(lead.created_at)}
+                          </p>
+                        </div>
+                        <Badge tone={leadStatusTone[lead.status]} className="capitalize">
+                          {lead.status}
+                        </Badge>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </CardBody>
+            </Card>
+          )}
         </div>
 
         <div className="space-y-6">
@@ -273,6 +327,8 @@ export default function Dashboard() {
           </Card>
         </div>
       </div>
+
+      {user?.is_super_admin && <LeadDetailModal lead={selectedLead} onClose={() => setSelectedLead(null)} />}
     </div>
   )
 }
